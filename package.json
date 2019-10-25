@@ -1,7 +1,7 @@
 {
-  "name": "WebRtcStreamer",
+  "name": "webcam-mjpeg-streamer",
   "version": "1.0.0",
-  "description": "Webcam RTC streamer",
+  "description": "Webcam mjpeg and blob streamer",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "^4.16.3",
     "https": "^1.0.0",
+    "uuid": "^3.3.3",
     "ws": "^6.0.0",
     "wss": "^3.3.4"
   }
