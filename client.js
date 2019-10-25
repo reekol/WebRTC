@@ -1,100 +1,43 @@
-const ws = new WebSocket('wss://seqr.link:3001')
-let connection = null
-let name = null
-let otherUsername = null
-
-ws.onopen  = ( ) => { console.log('Connected to the signaling server') }
-ws.onerror = err => { console.error(err) }
-ws.onmessage = msg => {
+let   connection        = null
+let   name              = null
+let   otherUsername     = null
+const ws                = new WebSocket('wss://seqr.link:3001')
+const error             = error         => { console.error(error) }
+const answer            = answr         => { connection.setLocalDescription(answr); sendMessage({type: 'answer',answer: answr}) }
+const offer             = ofr           => { sendMessage({ type: 'offer', offer: ofr }); connection.setLocalDescription(ofr)}
+const sendMessage       = message       => { message.otherUsername = otherUsername; ws.send(JSON.stringify(message)) }
+const closeCall         = ()            => { sendMessage({ type: 'close' }); handleClose() }
+const login             = ()            => { sendMessage({type: 'login'}) }
+const makeCall          = ()            => { otherUsername = document.querySelector('input#username-to-call').value; connection.createOffer( offer,error ) }
+const _close            = ()            => { connection.close(); connection.onicecandidate = null; connection.onaddstream = null }
+const _answer           = data          => { connection.setRemoteDescription(new RTCSessionDescription(data.answer)) }
+const _candidate        = data          => { connection.addIceCandidate     (new RTCIceCandidate(data.candidate))    }
+const _offer            = data          => { otherUsername = data.username; connection.setRemoteDescription(new RTCSessionDescription(data.offer)); connection.createAnswer(answer,error) }
+const _login            = async data    => {
+    let localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    document.querySelector('video#local').srcObject = localStream
+    connection = new RTCPeerConnection({ iceServers: [{ url: 'stun:seqr.link:3478' }] })
+    connection.addStream(localStream)
+    connection.onaddstream      = event  => { document.querySelector('video#remote').srcObject = event.stream }
+    connection.onicecandidate   = event  => { if (event.candidate) { sendMessage({ type: 'candidate', candidate: event.candidate }) } }
+    document.querySelector('#username').value = data.success
+}
+ws.onerror              = error
+ws.onopen               = ()             => { console.log('Connected to the signaling server') }
+ws.onmessage            = msg            => {
   console.log('Got message', msg.data)
   const data = JSON.parse(msg.data)
   switch (data.type) {
-    case 'login'    : handleLogin(data.success);                break
-    case 'offer'    : handleOffer(data.offer, data.username);   break
-    case 'answer'   : handleAnswer(data.answer);                break
-    case 'candidate': handleCandidate(data.candidate);          break
-    case 'close'    : handleClose();                            break
-    default:                                                    break
+    case '_login'    : _login    (data); break
+    case '_offer'    : _offer    (data); break
+    case '_answer'   : _answer   (data); break
+    case '_candidate': _candidate(data); break
+    case '_close'    : _close    ();     break
+    default:                             break
   }
 }
 
-
-const sendMessage = message => {
-  if (otherUsername) { message.otherUsername = otherUsername }
-  ws.send(JSON.stringify(message))
-}
-
-document.querySelector('div#call').style.display = 'none'
-
-document.querySelector('button#login').addEventListener('click', event => {
-  username = document.querySelector('input#username').value
-  if (username.length < 0) { alert('Please enter a username 🙂'); return }
-  sendMessage({type: 'login',username: username })
-})
-
-
-document.querySelector('button#call').addEventListener('click', () => {
-  const callToUsername = document.querySelector('input#username-to-call').value
-  if (callToUsername.length === 0) { alert('Enter a username 😉'); return }
-  otherUsername = callToUsername
-  connection.createOffer(
-    offer => {
-      sendMessage({ type: 'offer', offer: offer })
-      connection.setLocalDescription(offer)
-    },
-    error => {
-      alert('Error when creating an offer')
-      console.error(error)
-    }
-  )
-})
-
-document.querySelector('button#close-call').addEventListener('click', () => {
-  sendMessage({ type: 'close' })
-  handleClose()
-})
-/// **************** HANDLERS *****************  //
-const handleAnswer      = answer    => { connection.setRemoteDescription(new RTCSessionDescription(answer)) }
-const handleCandidate   = candidate => { connection.addIceCandidate(new RTCIceCandidate(candidate)) }
-const handleClose = () => {
-  otherUsername = null
-  document.querySelector('video#remote').src = null
-  connection.close()
-  connection.onicecandidate = null
-  connection.onaddstream = null
-}
-
-const handleLogin = async success => {
-    if (success === false) { alert('😞 Username already taken'); return }
-
-    const configuration = { iceServers: [{ url: 'stun:seqr.link:3478' }] }
-    document.querySelector('div#login').style.display = 'none'
-    document.querySelector('div#call').style.display = 'block'
-    let localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    document.querySelector('video#local').srcObject = localStream
-    connection = new RTCPeerConnection(configuration)
-    connection.addStream(localStream)
-    connection.onaddstream = event => { document.querySelector('video#remote').srcObject = event.stream }
-    connection.onicecandidate = event => { if (event.candidate) { sendMessage({ type: 'candidate', candidate: event.candidate }) } }
-
-}
-
-const handleOffer = (offer, username) => {
-  otherUsername = username
-  connection.setRemoteDescription(new RTCSessionDescription(offer))
-  connection.createAnswer(
-    answer => {
-      connection.setLocalDescription(answer)
-      sendMessage({
-        type: 'answer',
-        answer: answer
-      })
-    },
-    error => {
-      alert('Error when creating an answer')
-      console.error(error)
-    }
-  )
-}
-
-
+document.querySelector('button#close-call') .addEventListener('click', closeCall)
+document.querySelector('button#call')       .addEventListener('click', makeCall )
+document.querySelector('button#login')      .addEventListener('click', login    )
+setTimeout(login,1000)
