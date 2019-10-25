@@ -22,20 +22,10 @@ const _login            = async data    => {
     connection.onicecandidate   = event  => { if (event.candidate) { sendMessage({ type: 'candidate', candidate: event.candidate }) } }
     document.querySelector('#username').value = data.success
 }
+const handlers          = {_login:_login,_offer:_offer,_answer:_answer,_candidate:_candidate,_close:_close}
 ws.onerror              = error
 ws.onopen               = ()             => { console.log('Connected to the signaling server') }
-ws.onmessage            = msg            => {
-  console.log('Got message', msg.data)
-  const data = JSON.parse(msg.data)
-  switch (data.type) {
-    case '_login'    : _login    (data); break
-    case '_offer'    : _offer    (data); break
-    case '_answer'   : _answer   (data); break
-    case '_candidate': _candidate(data); break
-    case '_close'    : _close    ();     break
-    default:                             break
-  }
-}
+ws.onmessage            = msg            => { const data = JSON.parse(msg.data); handlers[data.type](data) }
 
 document.querySelector('button#close-call') .addEventListener('click', closeCall)
 document.querySelector('button#call')       .addEventListener('click', makeCall )

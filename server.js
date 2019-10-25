@@ -62,7 +62,7 @@ wss.on('connection', function connection(ws) {
         users[ws.otherUsername].otherUsername = null
 
         if (users[ws.otherUsername] != null) {
-          sendTo(users[ws.otherUsername], { type: 'close' })
+          sendTo(users[ws.otherUsername], { type: '_close' })
         }
       }
     }
