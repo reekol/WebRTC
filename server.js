@@ -27,31 +27,23 @@ wss.on('connection', function connection(ws) {
           soc           = ws
         break
       case 'offer':
-        if (users[data.otherUsername] != null) {
           ws.otherUsername  = data.otherUsername
           rsp.offer         = data.offer
           rsp.username      = ws.username
           soc               = users[data.otherUsername]
-        }
         break
       case 'answer':
-        if (users[data.otherUsername] != null) {
           ws.otherUsername  = data.otherUsername
           rsp.answer        = data.answer
           soc               = users[data.otherUsername]
-        }
         break
       case 'candidate':
-        if (users[data.otherUsername] != null) {
           rsp.candidate     = data.candidate
           soc               = users[data.otherUsername]
-        }
         break
       case 'close':
-        users[data.otherUsername].otherUsername = null
-        if (users[data.otherUsername] != null){
-            soc = users[data.otherUsername]
-        }
+          users[data.otherUsername].otherUsername = null
+          soc               = users[data.otherUsername]
         break
       default:
         soc = ws
