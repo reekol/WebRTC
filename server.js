@@ -9,8 +9,7 @@ const key       = fs.readFileSync('/var/www/html/seqr.link/crt/key.pem')
 const server    = https.createServer({cert:cert,key:key})
 const wss       = new WebSocket.Server({ server })
 
-wss.on('connection', function connection(ws) {
-  console.log('User connected')
+wss.on('connection', ws => {
   ws.on('message', message => {
     let data = null
     let soc  = null
@@ -20,11 +19,11 @@ wss.on('connection', function connection(ws) {
 
     switch (data.type) {
       case 'login':
-          let uuid      = uuidv()
-          ws.username   = uuid
-          rsp.success   = uuid
-          users[uuid]   = ws
-          soc           = ws
+          let uuid          = uuidv()
+          ws.username       = uuid
+          rsp.success       = uuid
+          users[uuid]       = ws
+          soc               = ws
         break
       case 'offer':
           ws.otherUsername  = data.otherUsername
@@ -46,8 +45,8 @@ wss.on('connection', function connection(ws) {
           soc               = users[data.otherUsername]
         break
       default:
-        soc = ws
-        rsp.message = 'Command not found: ' + data.type
+          soc               = ws
+          rsp.message       = 'Command not found: ' + data.type
         break
     }
     sendTo(soc, rsp)
@@ -56,7 +55,6 @@ wss.on('connection', function connection(ws) {
   ws.on('close', () => {
     if (ws.username) {
       delete users[ws.username]
-
       if (ws.otherUsername) {
         console.log('Disconnecting from ', ws.otherUsername)
         users[ws.otherUsername].otherUsername = null
