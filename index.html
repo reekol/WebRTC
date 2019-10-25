@@ -1,30 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <title>WebRTC</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
-
 <body>
-  <div id="login">
-    <label for="username">Login</label>
-    <input id="username" placeholder="Login" required="" autofocus="">
-    <button id="login">Login</button>
-  </div>
-
+  <button id="login">Login</button>
   <div id="call">
     <video id="local" autoplay></video>
     <video id="remote" autoplay></video>
-
     <div>
+      <input id="username"         readonly="readonly" />
       <input id="username-to-call" placeholder="Username to call" />
       <button id="call">Call</button>
       <button id="close-call">Close call</button>
     </div>
   </div>
+  <script src="client.js"></script>
 </body>
-<script src="client.js"></script>
-
 </html>
