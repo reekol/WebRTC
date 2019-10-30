@@ -8,6 +8,7 @@ const cert      = fs.readFileSync('/var/www/html/seqr.link/crt/certificate.pem')
 const key       = fs.readFileSync('/var/www/html/seqr.link/crt/key.pem')
 const server    = https.createServer({cert:cert,key:key})
 const wss       = new WebSocket.Server({ server })
+let d = console.log
 
 wss.on('connection', ws => {
   ws.on('message', message => {
@@ -19,7 +20,8 @@ wss.on('connection', ws => {
 
     switch (data.type) {
       case 'login':
-          let uuid          = uuidv()
+          let uuid
+          while( uuid = uuidv().substring(0,1) ) if(typeof users[uuid] === 'undefined') break;
           ws.username       = uuid
           rsp.success       = uuid
           users[uuid]       = ws
@@ -54,7 +56,7 @@ wss.on('connection', ws => {
 
   ws.on('close', () => {
     if (ws.username) {
-      delete users[ws.username]
+//     delete users[ws.username]
       if (ws.otherUsername) {
         console.log('Disconnecting from ', ws.otherUsername)
         users[ws.otherUsername].otherUsername = null
