@@ -21,7 +21,7 @@ wss.on('connection', ws => {
     switch (data.type) {
       case 'login':
           let uuid
-          while( uuid = uuidv().substring(0,1) ) if(typeof users[uuid] === 'undefined') break;
+          while( uuid = uuidv().substring(0,3) ) if(typeof users[uuid] === 'undefined') break;
           ws.username       = uuid
           rsp.success       = uuid
           users[uuid]       = ws
