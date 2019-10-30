@@ -56,7 +56,7 @@ wss.on('connection', ws => {
 
   ws.on('close', () => {
     if (ws.username) {
-//     delete users[ws.username]
+      delete users[ws.username]
       if (ws.otherUsername) {
         console.log('Disconnecting from ', ws.otherUsername)
         users[ws.otherUsername].otherUsername = null
