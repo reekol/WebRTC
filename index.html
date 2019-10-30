@@ -6,15 +6,14 @@
   <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-  <button id="login">Login</button>
   <div id="call">
     <video id="local" autoplay></video>
     <video id="remote" autoplay></video>
-    <div>
-      <input id="username"         readonly="readonly" />
-      <input id="username-to-call" placeholder="Username to call" />
-      <button id="call">Call</button>
-      <button id="close-call">Close call</button>
+    <div id="controlls">
+      <input  id="username"         readonly="readonly" />
+      <input  id="username-to-call" placeholder="Username to call" />
+      <button id="call-make" >&#9990;</button>
+      <button id="call-close">&#9209;</button>
     </div>
   </div>
   <script src="client.js"></script>

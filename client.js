@@ -14,7 +14,7 @@ const _answer           = data          => { connection.setRemoteDescription(new
 const _candidate        = data          => { connection.addIceCandidate     (new RTCIceCandidate(data.candidate))    }
 const _offer            = data          => { otherUsername = data.username; connection.setRemoteDescription(new RTCSessionDescription(data.offer)); connection.createAnswer(answer,error) }
 const _login            = async data    => {
-    let localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    let localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     let local       = document.querySelector('video#local')
     local.volume = 0; local.srcObject = localStream
     connection = new RTCPeerConnection({ iceServers: [{ url: 'stun:seqr.link:3478' }] })
@@ -27,7 +27,6 @@ const handlers          =                   {_login:_login,_offer:_offer,_answer
 ws.onopen               = ()             => { console.log('Connected to the signaling server') }
 ws.onmessage            = msg            => { const data = JSON.parse(msg.data); handlers[data.type](data) }
 ws.onerror              = error
-document.querySelector('button#close-call') .addEventListener('click', closeCall)
-document.querySelector('button#call')       .addEventListener('click', makeCall )
-document.querySelector('button#login')      .addEventListener('click', login    )
+document.querySelector('button#call-close') .addEventListener('click', closeCall)
+document.querySelector('button#call-make')  .addEventListener('click', makeCall )
 setTimeout(login,1000)
