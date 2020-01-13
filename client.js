@@ -6,7 +6,7 @@ const error             = error         => { console.error(error) }
 const answer            = answr         => { connection.setLocalDescription(answr); sendMessage({type: 'answer',answer: answr}) }
 const offer             = ofr           => { sendMessage({ type: 'offer', offer: ofr }); connection.setLocalDescription(ofr)}
 const sendMessage       = message       => { message.otherUsername = otherUsername; ws.send(JSON.stringify(message)) }
-const closeCall         = ()            => { sendMessage({ type: 'close' }); handleClose() }
+const closeCall         = ()            => { sendMessage({type: 'close' }); handleClose() }
 const login             = ()            => { sendMessage({type: 'login'}) }
 const makeCall          = ()            => { otherUsername = document.querySelector('input#username-to-call').value; connection.createOffer( offer,error ) }
 const _close            = ()            => { connection.close(); connection.onicecandidate = null; connection.onaddstream = null }
