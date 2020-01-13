@@ -9,7 +9,7 @@
   "author": "ReeKol",
   "license": "GPL",
   "dependencies": {
-    "express": "^4.16.3",
+    "express": "^4.17.1",
     "https": "^1.0.0",
     "uuid": "^3.3.3",
     "ws": "^6.0.0",

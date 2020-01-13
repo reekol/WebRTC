@@ -1,7 +1,7 @@
 let   connection        = null
 let   name              = null
 let   otherUsername     = null
-const ws                = new WebSocket('wss://seqr.link:3001')
+const ws                = new WebSocket('wss://seqr.link:3001/socket')
 const error             = error         => { console.error(error) }
 const answer            = answr         => { connection.setLocalDescription(answr); sendMessage({type: 'answer',answer: answr}) }
 const offer             = ofr           => { sendMessage({ type: 'offer', offer: ofr }); connection.setLocalDescription(ofr)}
@@ -14,11 +14,25 @@ const _answer           = data          => { connection.setRemoteDescription(new
 const _candidate        = data          => { connection.addIceCandidate     (new RTCIceCandidate(data.candidate))    }
 const _offer            = data          => { otherUsername = data.username; connection.setRemoteDescription(new RTCSessionDescription(data.offer)); connection.createAnswer(answer,error) }
 const _login            = async data    => {
-    let localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    let local       = document.querySelector('video#local')
-    local.volume = 0; local.srcObject = localStream
-    connection = new RTCPeerConnection({ iceServers: [{ url: 'stun:seqr.link:3478' }] })
-    connection.addStream(localStream)
+    let local      = document.querySelector('video#local')
+    let videoMode  = document.querySelector('select#videoMode').value
+    let audioMode  = document.querySelector('select#audioMode').value
+    let hasAudio   = ['sendrecv','sendonly'].includes(audioMode)
+    let hasVideo   = ['sendrecv','sendonly'].includes(videoMode)
+    let hasMedia   = ( hasAudio || hasVideo )
+        connection = new RTCPeerConnection({ iceServers: [{ url: 'stun:seqr.link:3478' }] })
+    if(hasMedia){
+        let localStream = await navigator.mediaDevices.getUserMedia({ video: hasVideo, audio: hasAudio })
+        local.volume = 0
+        local.srcObject = localStream
+        local.style.visibility = 'visible'
+        connection.addStream(localStream)
+    }
+
+    connection.addTransceiver('video',{currentDirection:videoMode})
+    connection.addTransceiver('audio',{currentDirection:audioMode})
+    document.querySelector('button#call-close') .style.visibility = 'visible'
+    document.querySelector('button#call-make')  .style.visibility = 'visible'
     connection.onaddstream      = event  => { document.querySelector('video#remote').srcObject = event.stream }
     connection.onicecandidate   = event  => { if (event.candidate) sendMessage({ type: 'candidate', candidate: event.candidate }) }
     document.querySelector('#username').value = data.success
@@ -29,4 +43,4 @@ ws.onmessage            = msg            => { const data = JSON.parse(msg.data);
 ws.onerror              = error
 document.querySelector('button#call-close') .addEventListener('click', closeCall)
 document.querySelector('button#call-make')  .addEventListener('click', makeCall )
-setTimeout(login,1000)
+document.querySelector('button#login') .addEventListener('click', login )

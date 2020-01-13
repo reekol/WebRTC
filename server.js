@@ -1,13 +1,16 @@
 const WebSocket = require('ws')
 const https     = require('https')
 const fs        = require('fs')
+const express   = require('express')
+const app       = express()
 const uuidv     = require('uuid/v4')
 const users     = {}
 const sendTo    = (ws, message) => {  ws.send(JSON.stringify(message)) }
-const cert      = fs.readFileSync('/var/www/html/seqr.link/crt/certificate.pem')
-const key       = fs.readFileSync('/var/www/html/seqr.link/crt/key.pem')
-const server    = https.createServer({cert:cert,key:key})
-const wss       = new WebSocket.Server({ server })
+const cert      = fs.readFileSync('./crt/certificate.pem')
+const key       = fs.readFileSync('./crt/key.pem')
+const server    = https.createServer({cert:cert,key:key},app)
+const wss       = new WebSocket.Server({ server: server , path: '/socket'})
+const cwd       = process.cwd()
 let d = console.log
 
 wss.on('connection', ws => {
@@ -69,4 +72,8 @@ wss.on('connection', ws => {
   })
 })
 
+app.get('/favicon.ico', (req, res) => res.sendFile(`${cwd}/icon.png`    ) )
+app.get('/',            (req, res) => res.sendFile(`${cwd}/index.html`  ) )
+app.get('/style.css',   (req, res) => res.sendFile(`${cwd}/style.css`   ) )
+app.get('/client.js',   (req, res) => res.sendFile(`${cwd}/client.js`   ) )
 server.listen(3001)

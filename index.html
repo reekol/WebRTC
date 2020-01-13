@@ -7,13 +7,26 @@
 </head>
 <body>
   <div id="call">
-    <video id="local" autoplay></video>
+    <video id="local" autoplay style="visibility:hidden"></video>
     <video id="remote" autoplay></video>
     <div id="controlls">
       <input  id="username"         readonly="readonly" />
       <input  id="username-to-call" placeholder="Username to call" />
-      <button id="call-make" >&#9990;</button>
-      <button id="call-close">&#9209;</button>
+      <button id="call-make"   style="visibility:hidden">&#9990;</button>
+      <button id="call-close"  style="visibility:hidden">&#9209;</button>
+      <select id="videoMode">
+        <option value="sendrecv">sendrecv</option>
+        <option value="sendonly">sendonly</option>
+        <option value="recvonly">recvonly</option>
+        <option value="inactive">inactive</option>
+      <select>
+      <select id="audioMode">
+        <option value="sendrecv">sendrecv</option>
+        <option value="sendonly">sendonly</option>
+        <option value="recvonly">recvonly</option>
+        <option value="inactive">inactive</option>
+      <select>
+      <button id="login" style="width:100px" >Login</button>
     </div>
   </div>
   <script src="client.js"></script>
