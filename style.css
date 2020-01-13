@@ -1,4 +1,4 @@
-#call              { width: 500px; height: 600px; position: relative; display: block; margin: 0 auto; border:0px solid red;background: #dedede }
+#call              { width: 500px; height: 650px; position: relative; display: block; margin: 0 auto; border:0px solid red;background: #dedede }
 #call video        { background: black; border: 1px solid gray; }
 #call video#local  { width: 150px; height: 150px; position: absolute; top: 15px; right: 15px;}
 #call video#remote { width: 500px; height: 500px;}
