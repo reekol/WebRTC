@@ -4,6 +4,7 @@ const fs        = require('fs')
 const express   = require('express')
 const app       = express()
 const uuidv     = require('uuid/v4')
+const cp        = require('child_process')
 const users     = {}
 const sendTo    = (ws, message) => {  ws.send(JSON.stringify(message)) }
 const cert      = fs.readFileSync('./crt/certificate.pem')
@@ -72,8 +73,14 @@ wss.on('connection', ws => {
   })
 })
 
+let stund = cp.spawn('/usr/sbin/stund',['-v','-h','192.168.1.105'])
+    stund.stdout.on('data', data => console.log   )
+    stund.stderr.on('data', data => console.error )
+    stund       .on('close', code => console.log  )
+
 app.get('/favicon.ico', (req, res) => res.sendFile(`${cwd}/icon.png`    ) )
 app.get('/',            (req, res) => res.sendFile(`${cwd}/index.html`  ) )
 app.get('/style.css',   (req, res) => res.sendFile(`${cwd}/style.css`   ) )
 app.get('/client.js',   (req, res) => res.sendFile(`${cwd}/client.js`   ) )
 server.listen(3001)
+
